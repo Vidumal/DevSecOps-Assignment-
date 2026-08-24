@@ -1,0 +1,286 @@
+PS D:\SLIIT\OneDrive - Sri Lanka Institute of Information Technology\Y3 S1\DevOps Security ( IE3142 )\assignment\test run\crAPI-main\deploy\docker> docker compose ps
+NAME                          IMAGE                          COMMAND                  SERVICE                       CREATED             STATUS                       PORTS
+api.mypremiumdealership.com   crapi/gateway-service:latest   "/app/server"            api.mypremiumdealership.com   About an hour ago   Up About an hour (healthy)   443/tcp
+chromadb                      chromadb/chroma:latest         "dumb-init -- chroma…"   chromadb                      About an hour ago   Up About an hour (healthy)   8000/tcp
+crapi-chatbot                 crapi/crapi-chatbot:latest     "/bin/sh -c /app/ent…"   crapi-chatbot                 About an hour ago   Up About an hour             5002/tcp, 5500/tcp
+crapi-community               crapi/crapi-community:latest   "/bin/sh -c /app/main"   crapi-community               About an hour ago   Up About an hour (healthy)   6060/tcp
+crapi-identity                crapi/crapi-identity:latest    "/__cacert_entrypoin…"   crapi-identity                About an hour ago   Up About an hour (healthy)   8080/tcp, 8989/tcp, 10001/tcp
+crapi-web                     crapi/crapi-web:latest         "/etc/nginx/nginx-wr…"   crapi-web                     About an hour ago   Up About an hour (healthy)   127.0.0.1:8888->80/tcp, 127.0.0.1:30080->80/tcp, 127.0.0.1:8443->443/tcp, 127.0.0.1:30443->443/tcp
+crapi-workshop                crapi/crapi-workshop:latest    "/app/runner.sh"         crapi-workshop                About an hour ago   Up About an hour (healthy)
+mailhog                       crapi/mailhog:latest           "MailHog"                mailhog                       About an hour ago   Up About an hour (healthy)   127.0.0.1:8025->8025/tcp
+mongodb                       mongo:4.4                      "docker-entrypoint.s…"   mongodb                       About an hour ago   Up About an hour (healthy)   27017/tcp
+postgresdb                    postgres:14                    "docker-entrypoint.s…"   postgresdb                    About an hour ago   Up About an hour (healthy)   5432/tcp
+PS D:\SLIIT\OneDrive - Sri Lanka Institute of Information Technology\Y3 S1\DevOps Security ( IE3142 )\assignment\test run\crAPI-main\deploy\docker> docker ps
+CONTAINER ID   IMAGE                          COMMAND                  CREATED             STATUS                       PORTS                                                                                                NAMES
+b18282a9c81f   crapi/crapi-web:latest         "/etc/nginx/nginx-wr…"   About an hour ago   Up About an hour (healthy)   127.0.0.1:8888->80/tcp, 127.0.0.1:30080->80/tcp, 127.0.0.1:8443->443/tcp, 127.0.0.1:30443->443/tcp   crapi-web
+fc67c77f6c20   crapi/crapi-workshop:latest    "/app/runner.sh"         About an hour ago   Up About an hour (healthy)                                                                                                        crapi-workshop
+8c5ed249a873   crapi/crapi-chatbot:latest     "/bin/sh -c /app/ent…"   About an hour ago   Up About an hour             5002/tcp, 5500/tcp                                                                                   crapi-chatbot
+fbb1f2f0be17   crapi/crapi-community:latest   "/bin/sh -c /app/main"   About an hour ago   Up About an hour (healthy)   6060/tcp                                                                                             crapi-community
+e116f4eb120d   crapi/crapi-identity:latest    "/__cacert_entrypoin…"   About an hour ago   Up About an hour (healthy)   8080/tcp, 8989/tcp, 10001/tcp                                                                        crapi-identity
+9d688344e6d5   postgres:14                    "docker-entrypoint.s…"   About an hour ago   Up About an hour (healthy)   5432/tcp                                                                                             postgresdb
+37fde0473f5c   crapi/mailhog:latest           "MailHog"                About an hour ago   Up About an hour (healthy)   127.0.0.1:8025->8025/tcp                                                                             mailhog
+fe1f4fd2b8da   mongo:4.4                      "docker-entrypoint.s…"   About an hour ago   Up About an hour (healthy)   27017/tcp                                                                                            mongodb
+43dc0ce98a19   chromadb/chroma:latest         "dumb-init -- chroma…"   About an hour ago   Up About an hour (healthy)   8000/tcp                                                                                             chromadb
+8af0de4af6d1   crapi/gateway-service:latest   "/app/server"            About an hour ago   Up About an hour (healthy)   443/tcp                                                                                              api.mypremiumdealership.com
+PS D:\SLIIT\OneDrive - Sri Lanka Institute of Information Technology\Y3 S1\DevOps Security ( IE3142 )\assignment\test run\crAPI-main\deploy\docker> docker compose config --services
+api.mypremiumdealership.com
+chromadb
+mailhog
+mongodb
+postgresdb
+crapi-identity
+crapi-chatbot
+crapi-community
+crapi-workshop
+crapi-web
+PS D:\SLIIT\OneDrive - Sri Lanka Institute of Information Technology\Y3 S1\DevOps Security ( IE3142 )\assignment\test run\crAPI-main\deploy\docker> docker network ls
+NETWORK ID     NAME                            DRIVER    SCOPE
+768fc764e060   bridge                          bridge    local
+a7f25f863ba5   ctfd_default                    bridge    local
+edbf0f068c84   ctfd_internal                   bridge    local
+45df63c12ff6   docker_default                  bridge    local
+74638aad3a35   host                            host      local
+95b17453563a   none                            null      local
+d32e80aee388   supabase_network_sea-radar-lk   bridge    local
+PS D:\SLIIT\OneDrive - Sri Lanka Institute of Information Technology\Y3 S1\DevOps Security ( IE3142 )\assignment\test run\crAPI-main\deploy\docker> docker network inspect 768fc764e060
+[
+    {
+        "Name": "bridge",
+        "Id": "768fc764e06050d89c9588dc067dcbe4bee04919340d094f55f6863cea2b05fa",
+        "Created": "2026-08-24T18:23:58.28615213Z",
+        "Scope": "local",
+        "Driver": "bridge",
+        "EnableIPv4": true,
+        "EnableIPv6": false,
+        "IPAM": {
+            "Driver": "default",
+            "Options": null,
+            "Config": [
+                {
+                    "Subnet": "172.17.0.0/16",
+                    "Gateway": "172.17.0.1"
+                }
+            ]
+        },
+        "Internal": false,
+        "Attachable": false,
+        "Ingress": false,
+        "ConfigFrom": {
+            "Network": ""
+        },
+        "ConfigOnly": false,
+        "Options": {
+            "com.docker.network.bridge.default_bridge": "true",
+            "com.docker.network.bridge.enable_icc": "true",
+            "com.docker.network.bridge.enable_ip_masquerade": "true",
+            "com.docker.network.bridge.host_binding_ipv4": "0.0.0.0",
+            "com.docker.network.bridge.name": "docker0",
+            "com.docker.network.driver.mtu": "1500"
+        },
+        "Labels": {},
+        "Containers": {},
+        "Status": {
+            "IPAM": {
+                "Subnets": {
+                    "172.17.0.0/16": {
+                        "IPsInUse": 3,
+                        "DynamicIPsAvailable": 65533
+                    }
+                }
+            }
+        }
+    }
+]
+PS D:\SLIIT\OneDrive - Sri Lanka Institute of Information Technology\Y3 S1\DevOps Security ( IE3142 )\assignment\test run\crAPI-main\deploy\docker> docker network inspect crapi
+[]
+Error response from daemon: network crapi not found
+PS D:\SLIIT\OneDrive - Sri Lanka Institute of Information Technology\Y3 S1\DevOps Security ( IE3142 )\assignment\test run\crAPI-main\deploy\docker> docker network inspect crapi-web
+[]
+Error response from daemon: network crapi-web not found
+PS D:\SLIIT\OneDrive - Sri Lanka Institute of Information Technology\Y3 S1\DevOps Security ( IE3142 )\assignment\test run\crAPI-main\deploy\docker> docker network inspect crapi-web
+[]
+Error response from daemon: network crapi-web not found
+PS D:\SLIIT\OneDrive - Sri Lanka Institute of Information Technology\Y3 S1\DevOps Security ( IE3142 )\assignment\test run\crAPI-main\deploy\docker> docker compose ps
+NAME                          IMAGE                          COMMAND                  SERVICE                       CREATED             STATUS                       PORTS
+api.mypremiumdealership.com   crapi/gateway-service:latest   "/app/server"            api.mypremiumdealership.com   About an hour ago   Up About an hour (healthy)   443/tcp
+chromadb                      chromadb/chroma:latest         "dumb-init -- chroma…"   chromadb                      About an hour ago   Up About an hour (healthy)   8000/tcp
+crapi-chatbot                 crapi/crapi-chatbot:latest     "/bin/sh -c /app/ent…"   crapi-chatbot                 About an hour ago   Up About an hour             5002/tcp, 5500/tcp
+crapi-community               crapi/crapi-community:latest   "/bin/sh -c /app/main"   crapi-community               About an hour ago   Up About an hour (healthy)   6060/tcp
+crapi-identity                crapi/crapi-identity:latest    "/__cacert_entrypoin…"   crapi-identity                About an hour ago   Up About an hour (healthy)   8080/tcp, 8989/tcp, 10001/tcp
+crapi-web                     crapi/crapi-web:latest         "/etc/nginx/nginx-wr…"   crapi-web                     About an hour ago   Up About an hour (healthy)   127.0.0.1:8888->80/tcp, 127.0.0.1:30080->80/tcp, 127.0.0.1:8443->443/tcp, 127.0.0.1:30443->443/tcp
+crapi-workshop                crapi/crapi-workshop:latest    "/app/runner.sh"         crapi-workshop                About an hour ago   Up About an hour (healthy)
+mailhog                       crapi/mailhog:latest           "MailHog"                mailhog                       About an hour ago   Up About an hour (healthy)   127.0.0.1:8025->8025/tcp
+mongodb                       mongo:4.4                      "docker-entrypoint.s…"   mongodb                       About an hour ago   Up About an hour (healthy)   27017/tcp
+postgresdb                    postgres:14                    "docker-entrypoint.s…"   postgresdb                    About an hour ago   Up About an hour (healthy)   5432/tcp
+PS D:\SLIIT\OneDrive - Sri Lanka Institute of Information Technology\Y3 S1\DevOps Security ( IE3142 )\assignment\test run\crAPI-main\deploy\docker> docker compose config --services
+chromadb
+mailhog
+mongodb
+postgresdb
+crapi-identity
+crapi-chatbot
+crapi-community
+crapi-workshop
+crapi-web
+api.mypremiumdealership.com
+PS D:\SLIIT\OneDrive - Sri Lanka Institute of Information Technology\Y3 S1\DevOps Security ( IE3142 )\assignment\test run\crAPI-main\deploy\docker> docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
+NAMES                         STATUS                       PORTS
+crapi-web                     Up About an hour (healthy)   127.0.0.1:8888->80/tcp, 127.0.0.1:30080->80/tcp, 127.0.0.1:8443->443/tcp, 127.0.0.1:30443->443/tcp
+crapi-workshop                Up About an hour (healthy)
+crapi-chatbot                 Up About an hour             5002/tcp, 5500/tcp
+crapi-community               Up About an hour (healthy)   6060/tcp
+crapi-identity                Up About an hour (healthy)   8080/tcp, 8989/tcp, 10001/tcp
+postgresdb                    Up About an hour (healthy)   5432/tcp
+mailhog                       Up About an hour (healthy)   127.0.0.1:8025->8025/tcp
+mongodb                       Up About an hour (healthy)   27017/tcp
+chromadb                      Up About an hour (healthy)   8000/tcp
+api.mypremiumdealership.com   Up About an hour (healthy)   443/tcp
+PS D:\SLIIT\OneDrive - Sri Lanka Institute of Information Technology\Y3 S1\DevOps Security ( IE3142 )\assignment\test run\crAPI-main\deploy\docker> docker compose ps
+NAME                          IMAGE                          COMMAND                  SERVICE                       CREATED             STATUS                       PORTS
+api.mypremiumdealership.com   crapi/gateway-service:latest   "/app/server"            api.mypremiumdealership.com   About an hour ago   Up About an hour (healthy)   443/tcp
+chromadb                      chromadb/chroma:latest         "dumb-init -- chroma…"   chromadb                      About an hour ago   Up About an hour (healthy)   8000/tcp
+crapi-chatbot                 crapi/crapi-chatbot:latest     "/bin/sh -c /app/ent…"   crapi-chatbot                 About an hour ago   Up About an hour             5002/tcp, 5500/tcp
+crapi-community               crapi/crapi-community:latest   "/bin/sh -c /app/main"   crapi-community               About an hour ago   Up About an hour (healthy)   6060/tcp
+crapi-identity                crapi/crapi-identity:latest    "/__cacert_entrypoin…"   crapi-identity                About an hour ago   Up About an hour (healthy)   8080/tcp, 8989/tcp, 10001/tcp
+crapi-web                     crapi/crapi-web:latest         "/etc/nginx/nginx-wr…"   crapi-web                     About an hour ago   Up About an hour (healthy)   127.0.0.1:8888->80/tcp, 127.0.0.1:30080->80/tcp, 127.0.0.1:8443->443/tcp, 127.0.0.1:30443->443/tcp
+crapi-workshop                crapi/crapi-workshop:latest    "/app/runner.sh"         crapi-workshop                About an hour ago   Up About an hour (healthy)
+mailhog                       crapi/mailhog:latest           "MailHog"                mailhog                       About an hour ago   Up About an hour (healthy)   127.0.0.1:8025->8025/tcp
+mongodb                       mongo:4.4                      "docker-entrypoint.s…"   mongodb                       About an hour ago   Up About an hour (healthy)   27017/tcp
+postgresdb                    postgres:14                    "docker-entrypoint.s…"   postgresdb                    About an hour ago   Up About an hour (healthy)   5432/tcp
+PS D:\SLIIT\OneDrive - Sri Lanka Institute of Information Technology\Y3 S1\DevOps Security ( IE3142 )\assignment\test run\crAPI-main\deploy\docker>
+
+
+PS D:\SLIIT\OneDrive - Sri Lanka Institute of Information Technology\Y3 S1\DevOps Security ( IE3142 )\assignment\test run\crAPI-main\deploy\docker> docker compose ps
+NAME                          IMAGE                          COMMAND                  SERVICE                       CREATED          STATUS                    PORTS
+api.mypremiumdealership.com   crapi/gateway-service:latest   "/app/server"            api.mypremiumdealership.com   21 minutes ago   Up 21 minutes (healthy)   443/tcp
+chromadb                      chromadb/chroma:latest         "dumb-init -- chroma…"   chromadb                      21 minutes ago   Up 21 minutes (healthy)   8000/tcp
+crapi-chatbot                 crapi/crapi-chatbot:latest     "/bin/sh -c /app/ent…"   crapi-chatbot                 21 minutes ago   Up 20 minutes             5002/tcp, 5500/tcp
+crapi-community               crapi/crapi-community:latest   "/bin/sh -c /app/main"   crapi-community               21 minutes ago   Up 20 minutes (healthy)   6060/tcp
+crapi-identity                crapi/crapi-identity:latest    "/__cacert_entrypoin…"   crapi-identity                21 minutes ago   Up 21 minutes (healthy)   8080/tcp, 8989/tcp, 10001/tcp
+crapi-web                     crapi/crapi-web:latest         "/etc/nginx/nginx-wr…"   crapi-web                     21 minutes ago   Up 19 minutes (healthy)   127.0.0.1:8888->80/tcp, 127.0.0.1:30080->80/tcp, 127.0.0.1:8443->443/tcp, 127.0.0.1:30443->443/tcp
+crapi-workshop                crapi/crapi-workshop:latest    "/app/runner.sh"         crapi-workshop                21 minutes ago   Up 20 minutes (healthy)
+mailhog                       crapi/mailhog:latest           "MailHog"                mailhog                       21 minutes ago   Up 21 minutes (healthy)   127.0.0.1:8025->8025/tcp
+mongodb                       mongo:4.4                      "docker-entrypoint.s…"   mongodb                       21 minutes ago   Up 21 minutes (healthy)   27017/tcp
+postgresdb                    postgres:14                    "docker-entrypoint.s…"   postgresdb                    21 minutes ago   Up 21 minutes (healthy)   5432/tcp
+PS D:\SLIIT\OneDrive - Sri Lanka Institute of Information Technology\Y3 S1\DevOps Security ( IE3142 )\assignment\test run\crAPI-main\deploy\docker> docker network inspect crapi
+[
+    {
+        "Name": "crapi",
+        "Id": "e86cc440c0532bb1eea404d5c61f0b619bc0e7a538c7af23dbaf9af55be1ff66",
+        "Created": "2026-08-24T20:25:00.307059329Z",
+        "Scope": "local",
+        "Driver": "bridge",
+        "EnableIPv4": true,
+        "EnableIPv6": false,
+        "IPAM": {
+            "Driver": "default",
+            "Options": null,
+            "Config": [
+                {
+                    "Subnet": "172.21.0.0/16",
+                    "Gateway": "172.21.0.1"
+                }
+            ]
+        },
+        "Internal": false,
+        "Attachable": false,
+        "Ingress": false,
+        "ConfigFrom": {
+            "Network": ""
+        },
+        "ConfigOnly": false,
+        "Options": {
+            "com.docker.network.enable_ipv4": "true",
+            "com.docker.network.enable_ipv6": "false"
+        },
+        "Labels": {
+            "com.docker.compose.config-hash": "a76b6ff2d81c44876b305809506ae14d11f2296f387674feea0cbfc44fc57364",
+            "com.docker.compose.network": "default",
+            "com.docker.compose.project": "docker",
+            "com.docker.compose.version": "5.3.0"
+        },
+        "Containers": {
+            "043614ee3e3a37743f231a97652d059a13b3023ba61a323dcc0309c60cfef3fd": {
+                "Name": "mailhog",
+                "EndpointID": "02fe946e546d45a2320ace6a297c6bc9efb38020ae9a9d233001ab437032f56b",
+                "MacAddress": "fa:b9:53:36:26:5f",
+                "IPv4Address": "172.21.0.2/16",
+                "IPv6Address": ""
+            },
+            "11fc0bc7807f9ce14ba7cad1287e55846b7824f1e17020e1ea8b08754452fd70": {
+                "Name": "postgresdb",
+                "EndpointID": "ba95de6cc55cad14b8bf2c8d8720e3a9099f5576db526a3d8ab955631854781a",
+                "MacAddress": "c2:d1:ce:93:80:f5",
+                "IPv4Address": "172.21.0.3/16",
+                "IPv6Address": ""
+            },
+            "3ed2585ee85ee949980cfb22a7171661c1e16cd7bdf30258323bbb7d3d4cafb9": {
+                "Name": "chromadb",
+                "EndpointID": "9cc1e04e9f1a3350579ca999c9d342f71f2d4c166cfe67d6e68dc38d5407565e",
+                "MacAddress": "3a:70:67:77:56:04",
+                "IPv4Address": "172.21.0.4/16",
+                "IPv6Address": ""
+            },
+            "5e56ccefce9385c307385f632dde3be9b4d3a15cc48416a309cdad6189ee1f63": {
+                "Name": "crapi-identity",
+                "EndpointID": "e5188dc4f5b9bc2fb67ca80fc959f3abaf43f25e2d1cee72eb4ef28e59d948a4",
+                "MacAddress": "52:31:ed:29:a2:a5",
+                "IPv4Address": "172.21.0.7/16",
+                "IPv6Address": ""
+            },
+            "7bdec147c1e2b5ed37a4d620b49ea1220a7d411da8c43813ffe83fb73ee158e2": {
+                "Name": "api.mypremiumdealership.com",
+                "EndpointID": "a5ec3578cffd750014256c9a29f25a33e1323b70d421cb4288e2e5164f033688",
+                "MacAddress": "b6:6a:f8:1a:38:01",
+                "IPv4Address": "172.21.0.6/16",
+                "IPv6Address": ""
+            },
+            "7f95efd01a908c12e0c4a0b495c2071b6a3b07e485ba1524a815841f00b1ca08": {
+                "Name": "crapi-chatbot",
+                "EndpointID": "51d7caca7a26e78d81e4f0101114cbf4324a7bcbd033407d0700ef3d3fc10453",
+                "MacAddress": "f6:25:97:95:ee:1e",
+                "IPv4Address": "172.21.0.9/16",
+                "IPv6Address": ""
+            },
+            "9bc272471bafc45284f4e3bceeecdd521dd66affe490fd655ab06d7a59c99732": {
+                "Name": "mongodb",
+                "EndpointID": "4279272de45cfb8151d6110bffd8552165cab6820be53ea6a3fd0938d8cc5b23",
+                "MacAddress": "02:9a:ac:bb:4c:8a",
+                "IPv4Address": "172.21.0.5/16",
+                "IPv6Address": ""
+            },
+            "e1e7e05608876ba3cd07da7a378f0a609724ec0cee1b395b7c1794191978f6ec": {
+                "Name": "crapi-workshop",
+                "EndpointID": "c0a0e03ac67a7abb607c49ea747c77e9fe7110b3a5e29220e98cef8daa777fda",
+                "MacAddress": "36:2c:dd:77:f2:7a",
+                "IPv4Address": "172.21.0.10/16",
+                "IPv6Address": ""
+            },
+            "ea2d8f2679165bb093f8d52565773348eba541c4b588d3b9f2c004cee5f688dc": {
+                "Name": "crapi-community",
+                "EndpointID": "e22b205cc551bc5836bd31cbcd8456c46356e9e47eccdff7ae63c77cd1bc03c3",
+                "MacAddress": "96:8a:15:73:be:b3",
+                "IPv4Address": "172.21.0.8/16",
+                "IPv6Address": ""
+            },
+            "fa867913e232599b95ff885f73a71fd3c8b1bb32204d4fda6d6bb04a6cd5eccf": {
+                "Name": "crapi-web",
+                "EndpointID": "0095a5a65823f270524a083489905a9df091c30ce4d4e83e9fcde348b2dac8f8",
+                "MacAddress": "02:fb:98:0c:44:93",
+                "IPv4Address": "172.21.0.11/16",
+                "IPv6Address": ""
+            }
+        },
+        "Status": {
+            "IPAM": {
+                "Subnets": {
+                    "172.21.0.0/16": {
+                        "IPsInUse": 13,
+                        "DynamicIPsAvailable": 65523
+                    }
+                }
+            }
+        }
+    }
+]
+PS D:\SLIIT\OneDrive - Sri Lanka Institute of Information Technology\Y3 S1\DevOps Security ( IE3142 )\assignment\test run\crAPI-main\deploy\docker>
