@@ -42,7 +42,7 @@ jobs:
           config: p/security-audit
 
 
-    dependency-scan:
+  dependency-scan:
     name: Dependency Vulnerability Scan
     runs-on: ubuntu-latest
 
