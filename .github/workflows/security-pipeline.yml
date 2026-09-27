@@ -81,7 +81,8 @@ jobs:
 
 
   
-    container-scan:
+
+  container-scan:
     name: Container Security - Trivy
     runs-on: ubuntu-latest
 
