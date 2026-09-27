@@ -5,34 +5,58 @@ on:
     branches:
       - main
       - develop
+
   pull_request:
     branches:
       - main
 
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
 jobs:
+
+  # ============================================================
+  # 1. BUILD
+  # ============================================================
 
   build:
     name: Build Application
     runs-on: ubuntu-latest
 
     steps:
+
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Build Docker Compose services
+      - name: Check Docker Compose
         run: |
-          docker compose build
+          docker compose version
+
+      - name: Validate Docker Compose
+        run: |
+          docker compose config
+
+      - name: Pull crAPI images
+        run: |
+          docker compose pull
 
       - name: Verify Docker images
         run: |
           docker images
 
-  
+
+  # ============================================================
+  # 2. SAST - SEMGREP
+  # ============================================================
+
   sast:
     name: SAST - Semgrep
     runs-on: ubuntu-latest
 
     steps:
+
       - name: Checkout repository
         uses: actions/checkout@v4
 
@@ -42,63 +66,75 @@ jobs:
           config: p/security-audit
 
 
+  # ============================================================
+  # 3. DEPENDENCY SCANNING
+  # ============================================================
+
   dependency-scan:
     name: Dependency Vulnerability Scan
     runs-on: ubuntu-latest
 
     steps:
+
       - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Run Trivy filesystem scan
-        uses: aquasecurity/trivy-action@master
+        uses: aquasecurity/trivy-action@v0.36.0
         with:
           scan-type: fs
           scan-ref: .
           scanners: vuln
-          severity: CRITICAL,HIGH
-          exit-code: '1'
+          severity: HIGH,CRITICAL
           ignore-unfixed: true
+          exit-code: '1'
 
 
-
+  # ============================================================
+  # 4. SECRETS SCANNING - GITLEAKS
+  # ============================================================
 
   secrets-scan:
     name: Secrets Scan - Gitleaks
     runs-on: ubuntu-latest
 
     steps:
+
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
       - name: Run Gitleaks
-        uses: gitleaks/gitleaks-action@v2
+        uses: gitleaks/gitleaks-action@v3
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 
-
-  
+  # ============================================================
+  # 5. CONTAINER IMAGE SCANNING - TRIVY
+  # ============================================================
 
   container-scan:
     name: Container Security - Trivy
     runs-on: ubuntu-latest
 
     steps:
+
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Build workshop image
+      - name: Pull crAPI workshop image
         run: |
-          docker compose build crapi-workshop
+          docker pull crapi/crapi-workshop:latest
 
-      - name: Scan workshop image
-        uses: aquasecurity/trivy-action@master
+      - name: Scan crAPI workshop image
+        uses: aquasecurity/trivy-action@v0.36.0
         with:
+          scan-type: image
           image-ref: crapi/crapi-workshop:latest
           format: table
-          severity: CRITICAL,HIGH
-          exit-code: '1'
+          vuln-type: os,library
+          severity: HIGH,CRITICAL
           ignore-unfixed: true
+          exit-code: '1'
