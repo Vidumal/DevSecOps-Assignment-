@@ -42,4 +42,24 @@ jobs:
           config: p/security-audit
 
 
-  
+    dependency-scan:
+    name: Dependency Vulnerability Scan
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Run Trivy filesystem scan
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: fs
+          scan-ref: .
+          scanners: vuln
+          severity: CRITICAL,HIGH
+          exit-code: '1'
+          ignore-unfixed: true
+
+
+
+
