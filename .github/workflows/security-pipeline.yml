@@ -17,16 +17,11 @@ permissions:
 
 jobs:
 
-  # ============================================================
-  # 1. BUILD
-  # ============================================================
-
   build:
     name: Build Application
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     steps:
-
       - name: Checkout repository
         uses: actions/checkout@v6
 
@@ -47,16 +42,11 @@ jobs:
           docker images
 
 
-  # ============================================================
-  # 2. SAST - SEMGREP
-  # ============================================================
-
   sast:
     name: SAST - Semgrep
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     steps:
-
       - name: Checkout repository
         uses: actions/checkout@v6
 
@@ -66,16 +56,11 @@ jobs:
           config: p/security-audit
 
 
-  # ============================================================
-  # 3. DEPENDENCY SCANNING
-  # ============================================================
-
   dependency-scan:
     name: Dependency Vulnerability Scan
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     steps:
-
       - name: Checkout repository
         uses: actions/checkout@v6
 
@@ -90,16 +75,11 @@ jobs:
           exit-code: '1'
 
 
-  # ============================================================
-  # 4. SECRETS SCANNING - GITLEAKS
-  # ============================================================
-
   secrets-scan:
     name: Secrets Scan - Gitleaks
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     steps:
-
       - name: Checkout repository
         uses: actions/checkout@v6
         with:
@@ -111,16 +91,11 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 
-  # ============================================================
-  # 5. CONTAINER IMAGE SCANNING - TRIVY
-  # ============================================================
-
   container-scan:
     name: Container Security - Trivy
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     steps:
-
       - name: Checkout repository
         uses: actions/checkout@v6
 
