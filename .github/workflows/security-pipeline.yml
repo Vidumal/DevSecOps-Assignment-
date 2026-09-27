@@ -77,3 +77,27 @@ jobs:
         uses: gitleaks/gitleaks-action@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+
+
+  
+    container-scan:
+    name: Container Security - Trivy
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build workshop image
+        run: |
+          docker compose build crapi-workshop
+
+      - name: Scan workshop image
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: crapi/crapi-workshop:latest
+          format: table
+          severity: CRITICAL,HIGH
+          exit-code: '1'
+          ignore-unfixed: true
