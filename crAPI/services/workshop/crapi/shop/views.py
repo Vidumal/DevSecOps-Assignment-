@@ -383,18 +383,18 @@ class ApplyCouponView(APIView):
             log_error(request.path, request.data, 400, serializer.errors)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         row = None
-with connection.cursor() as cursor:
-    try:
-        cursor.execute(
-            """
-            SELECT coupon_code
-            FROM applied_coupon
-            WHERE user_id = %s
-            AND coupon_code = %s
-            """,
-            [user.id, coupon_request_body["coupon_code"]],
-        )
-        row = cursor.fetchall()
+        with connection.cursor() as cursor:
+            try:
+                cursor.execute(
+                    """
+                    SELECT coupon_code
+                    FROM applied_coupon
+                    WHERE user_id = %s
+                    AND coupon_code = %s
+                    """,
+                    [user.id, coupon_request_body["coupon_code"]],
+                )
+                row = cursor.fetchall()
             except Exception as e:
                 log_error(request.path, request.data, 500, e)
                 return Response(

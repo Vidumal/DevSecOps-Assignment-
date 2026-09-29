@@ -214,13 +214,16 @@ class GetReportView(APIView):
     def get(self, request, user=None):
         """
         fetch service request details from report_link
+
         :param request: http request for the view
-            method allowed: GET
+        :param user: User object of the requesting user
         :returns Response object with
-            service request object and 200 status if no error
+            service request object and 200 status if authorized
             message and corresponding status if error
         """
-        report_id = request.GET["report_id"]
+
+        report_id = request.GET.get("report_id")
+
         if not report_id:
             return Response(
                 {"message": messages.REPORT_ID_MISSING},
@@ -232,15 +235,29 @@ class GetReportView(APIView):
                 {"message": messages.INVALID_REPORT_ID},
                 status=status.HTTP_400_BAD_REQUEST,
             )
-        service_request = ServiceRequest.objects.filter(id=report_id).first()
+
+        # Authorization check:
+        # Only allow a mechanic to access service requests assigned to them.
+        service_request = (
+            ServiceRequest.objects
+            .filter(
+                id=report_id,
+                mechanic__user=user,
+            )
+            .first()
+        )
+
         if not service_request:
             return Response(
                 {"message": messages.REPORT_DOES_NOT_EXIST},
-                status=status.HTTP_400_BAD_REQUEST,
+                status=status.HTTP_404_NOT_FOUND,
             )
+
         serializer = MechanicServiceRequestSerializer(service_request)
         response_data = dict(serializer.data)
+
         service_report_pdf(response_data, report_id)
+
         return Response(response_data, status=status.HTTP_200_OK)
 
 
