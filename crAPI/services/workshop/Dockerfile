@@ -31,14 +31,14 @@ ENV PYTHONUNBUFFERED=1
 RUN mkdir /app
 WORKDIR /app
 COPY ./ /app
-RUN pip install wheel && pip wheel . --wheel-dir /app/wheels
+RUN pip install --default-timeout=300 wheel && \
+    pip wheel --default-timeout=300 . --wheel-dir /app/wheels
 
 FROM python:3.11-alpine
 COPY --from=build /app /app
 WORKDIR /app
 RUN apk update && apk add --no-cache postgresql-libs curl
 RUN pip install --no-index --find-links=/app/wheels -r requirements.txt
-COPY ./certs /app/certs
 COPY health.sh /app/health.sh
 ARG SERVER_PORT
 EXPOSE ${SERVER_PORT}
