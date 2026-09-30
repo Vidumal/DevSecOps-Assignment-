@@ -20,21 +20,23 @@ logger = logging.getLogger(__name__)
 @chat_bp.route("/init", methods=["POST"])
 async def init():
     session_id = await get_or_create_session_id()
-    data = await request.get_json()
+    data = await request.get_json(silent=True)
     logger.debug("Initializing bot for session %s", session_id)
     api_key = await get_api_key(session_id)
     if api_key:
         logger.info("Model already initialized with OpenAI API Key from environment")
         return jsonify({"message": "Model Already Initialized"}), 200
-    elif not data:
+    elif not data or not isinstance(data, dict):
         logger.error("Invalid request")
         return jsonify({"message": "Invalid request"}), 400
     elif "openai_api_key" not in data:
         logger.error("openai_api_key not provided")
         return jsonify({"message": "openai_api_key not provided"}), 400
     openai_api_key: str = data["openai_api_key"]
+    if not openai_api_key or not isinstance(openai_api_key, str):
+        logger.error("openai_api_key is empty or invalid")
+        return jsonify({"message": "openai_api_key is empty or invalid"}), 400
     logger.debug("OpenAI API Key %s", openai_api_key[:5])
-    # Save the api key in session
     await store_api_key(session_id, openai_api_key)
     return jsonify({"message": "Initialized"}), 200
 
@@ -42,9 +44,9 @@ async def init():
 @chat_bp.route("/model", methods=["POST"])
 async def model():
     session_id = await get_or_create_session_id()
-    data = await request.get_json()
+    data = await request.get_json(silent=True)
     model_name = Config.DEFAULT_MODEL_NAME
-    if data and "model_name" in data and data["model_name"]:
+    if isinstance(data, dict) and data.get("model_name"):
         model_name = data["model_name"]
     logger.debug("Setting model %s for session %s", model_name, session_id)
     await store_model_name(session_id, model_name)
@@ -59,8 +61,10 @@ async def chat():
     user_jwt = await get_user_jwt()
     if not openai_api_key:
         return jsonify({"message": "Missing OpenAI API key. Please authenticate."}), 400
-    data = await request.get_json()
-    message = data.get("message", "").strip()
+    data = await request.get_json(silent=True)
+    if not isinstance(data, dict):
+        return jsonify({"message": "Invalid request body"}), 400
+    message = str(data.get("message", "")).strip()
     id = data.get("id", uuid4().int & (1 << 63) - 1)
     if not message:
         return jsonify({"message": "Message is required", "id": id}), 400
@@ -117,8 +121,10 @@ async def history():
 @chat_bp.route("/reset", methods=["POST"])
 async def reset():
     session_id = await get_or_create_session_id()
-    logger.debug("Checking state for session %s", session_id)
+    logger.debug("Resetting state for session %s", session_id)
     await delete_chat_history(session_id)
+    await delete_api_key(session_id)
+    await store_model_name(session_id, Config.DEFAULT_MODEL_NAME)
     return jsonify({"initialized": "false", "message": "Reset successful"}), 200
 
 
