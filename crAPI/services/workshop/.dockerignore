@@ -1,2 +1,8 @@
+@"
 debug.log
 Dockerfile
+.env
+*.env
+__pycache__
+*.pyc
+"@ | Set-Content .\crAPI\services\workshop\.dockerignore
