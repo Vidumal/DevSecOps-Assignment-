@@ -8,6 +8,7 @@ import (
 	"log"
 	"math/rand"
 	"net/http"
+	"os"
 	"strings"
 	"time"
 
@@ -111,13 +112,17 @@ func GetPayMentInfo(w http.ResponseWriter, r *http.Request) {
 	user, pass, ok := r.BasicAuth()
 	if !ok {
 		http.Error(w, "Bad Request. Invalid Auth.", 400)
-		log.Printf("Bad Request. Invalid Auth. %s\n", r.Header["Authorization"][0])
+		if len(r.Header["Authorization"]) > 0 {
+			log.Printf("Bad Request. Invalid Auth. %s\n", r.Header["Authorization"][0])
+		}
 		return
 	}
 	if !checkCreds(user, pass) {
 		http.Error(w, "Unauthorized.", 401)
 		return
 	}
+	defer r.Body.Close()
+
 	var p_req PaymentInfoRequest
 	err := json.NewDecoder(r.Body).Decode(&p_req)
 	if err != nil {
@@ -151,10 +156,13 @@ func GetPayMentInfo(w http.ResponseWriter, r *http.Request) {
 }
 
 func checkCreds(user string, pass string) bool {
-	if user == "vendorcrapi" && pass == "Pa$$4Vendor_1" {
-		return true
+	configuredUser := strings.TrimSpace(os.Getenv("GATEWAY_USERNAME"))
+	configuredPass := strings.TrimSpace(os.Getenv("GATEWAY_PASSWORD"))
+	if configuredUser == "" || configuredPass == "" {
+		log.Printf("Gateway credentials are not configured. Set GATEWAY_USERNAME and GATEWAY_PASSWORD.")
+		return false
 	}
-	return false
+	return user == configuredUser && pass == configuredPass
 }
 
 func maskLeft(s string) string {
