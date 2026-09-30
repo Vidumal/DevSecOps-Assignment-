@@ -10,13 +10,19 @@ SESSION_COOKIE_NAME = "chat_session_id"
 
 async def get_or_create_session_id():
     session_id = request.cookies.get(SESSION_COOKIE_NAME)
-    if not session_id:
+    if not session_id or not session_id.strip():
         session_id = str(uuid.uuid4())
 
         @after_this_request
         def after_index(response):
+            forwarded_proto = request.headers.get("X-Forwarded-Proto", "").lower()
+            is_secure = request.scheme == "https" or forwarded_proto == "https"
             response.set_cookie(
-                SESSION_COOKIE_NAME, session_id, httponly=True, secure=True
+                SESSION_COOKIE_NAME,
+                session_id,
+                httponly=True,
+                secure=is_secure,
+                samesite="Lax",
             )
             return response
 
@@ -63,6 +69,14 @@ async def get_model_name(session_id):
 
 async def get_user_jwt() -> str | None:
     auth = request.headers.get("Authorization", "")
-    if auth.startswith("Bearer "):
-        return auth.replace("Bearer ", "")
-    return None
+    if not auth:
+        return None
+
+    scheme, separator, token = auth.partition(" ")
+    if separator == "" or scheme.lower() != "bearer":
+        return None
+
+    token = token.strip()
+    if not token:
+        return None
+    return token
