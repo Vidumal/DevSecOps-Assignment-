@@ -322,8 +322,3 @@ volumes:
   mongodb-data:
   postgresql-data:
   chromadb-data:
-
-
-networks:
-  default:
-    name: crapi
