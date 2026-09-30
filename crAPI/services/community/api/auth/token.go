@@ -49,6 +49,17 @@ func ExtractToken(r *http.Request) string {
 	return ""
 }
 
+// Pretty display the claims licely in the terminal
+func Pretty(data interface{}) {
+	b, err := json.MarshalIndent(data, "", " ")
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	log.Println(string(b))
+}
+
 // ExtractTokenID Verify token either it's valid or not.
 // If token is valid we extract username from token Claims.
 // Then check that username in postgres database.
@@ -118,14 +129,5 @@ func CheckTokenInDB(username string, db *gorm.DB) error {
 }
 
 // Pretty display the claims licely in the terminal
-func Pretty(data interface{}) {
-	b, err := json.MarshalIndent(data, "", " ")
-	if err != nil {
-		log.Println(err)
-		return
-	}
-
-	log.Println(string(b))
-}
 
 //

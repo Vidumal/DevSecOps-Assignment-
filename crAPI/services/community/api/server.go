@@ -43,38 +43,51 @@ func identityServiceHealthCheck() {
 		time.Sleep(5 * time.Second)
 		log.Fatal("IDENTITY_SERVICE is not set")
 	}
-	var attempts = 0
-	http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
-	for (attempts <= 5) {
-		tlsEnabled := os.Getenv("TLS_ENABLED")
-		identityHealthCheckUrl := fmt.Sprintf("http://%s/identity/health_check", os.Getenv("IDENTITY_SERVICE"))
-		if tlsEnabled == "true" {
-			identityHealthCheckUrl = fmt.Sprintf("https://%s/identity/health_check", os.Getenv("IDENTITY_SERVICE"))
+
+	client := &http.Client{
+		Timeout: 10 * time.Second,
+		Transport: &http.Transport{
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+		},
+	}
+
+	for attempts := 0; attempts <= 5; attempts++ {
+		healthURL := fmt.Sprintf("http://%s/identity/health_check", os.Getenv("IDENTITY_SERVICE"))
+		if os.Getenv("TLS_ENABLED") == "true" {
+			healthURL = fmt.Sprintf("https://%s/identity/health_check", os.Getenv("IDENTITY_SERVICE"))
 		}
-		resp, err := http.Get(identityHealthCheckUrl)
+
+		resp, err := client.Get(healthURL)
 		if err != nil {
 			log.Printf("Error while checking the health of identity service: %v", err)
+			if attempts == 5 {
+				log.Fatal("Identity service is not healthy. Terminating...")
+			}
 			log.Printf("Retrying in 5 seconds...")
 			time.Sleep(5 * time.Second)
-			attempts++
 			continue
 		}
-		defer func() {
+
+		if resp.StatusCode == http.StatusOK {
 			if err := resp.Body.Close(); err != nil {
 				log.Println("Error closing response body:", err)
 			}
-		}()
-		if resp.StatusCode != http.StatusOK {
-			log.Printf("Identity service is not healthy: %v", resp.Status)
-			log.Printf("Retrying in 5 seconds...")
-			time.Sleep(5 * time.Second)
-			attempts++
-			continue
+			log.Printf("Identity service is healthy")
+			time.Sleep(1 * time.Second)
+			return
 		}
-		log.Printf("Identity service is healthy")
-		time.Sleep(1 * time.Second)
-		return
+
+		if err := resp.Body.Close(); err != nil {
+			log.Println("Error closing response body:", err)
+		}
+		log.Printf("Identity service is not healthy: %v", resp.Status)
+		if attempts == 5 {
+			log.Fatal("Identity service is not healthy. Terminating...")
+		}
+		log.Printf("Retrying in 5 seconds...")
+		time.Sleep(5 * time.Second)
 	}
+
 	log.Fatal("Identity service is not healthy. Terminating...")
 }
 
