@@ -232,11 +232,14 @@ class GetReportView(APIView):
                 {"message": messages.INVALID_REPORT_ID},
                 status=status.HTTP_400_BAD_REQUEST,
             )
-        service_request = ServiceRequest.objects.filter(id=report_id).first()
+        service_request = ServiceRequest.objects.filter(
+            id=report_id,
+            vehicle__owner=user,
+        ).first()
         if not service_request:
             return Response(
                 {"message": messages.REPORT_DOES_NOT_EXIST},
-                status=status.HTTP_400_BAD_REQUEST,
+                status=status.HTTP_404_NOT_FOUND,
             )
         serializer = MechanicServiceRequestSerializer(service_request)
         response_data = dict(serializer.data)
@@ -347,8 +350,18 @@ class ServiceRequestView(APIView):
     @jwt_auth_required
     def put(self, request, user=None, service_request_id=None):
         """
-        update the status of a service request
+        update the status of a service request assigned to this mechanic
         """
+        service_request = ServiceRequest.objects.filter(
+            id=service_request_id,
+            mechanic__user=user,
+        ).first()
+        if not service_request:
+            return Response(
+                {"message": messages.NO_OBJECT_FOUND},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
         serializer = ServiceRequestStatusUpdateSerializer(data=request.data)
         if not serializer.is_valid():
             log_error(
@@ -358,18 +371,26 @@ class ServiceRequestView(APIView):
                 serializer.errors,
             )
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        service_request = ServiceRequest.objects.get(id=service_request_id)
         service_request.status = request.data["status"]
         service_request.updated_on = timezone.now()
         service_request.save()
         serializer = MechanicServiceRequestSerializer(service_request)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+    @jwt_auth_required
     def get(self, request, user=None, service_request_id=None):
         """
-        get a service request
+        get a service request assigned to the authenticated mechanic
         """
-        service_request = ServiceRequest.objects.get(id=service_request_id)
+        service_request = ServiceRequest.objects.filter(
+            id=service_request_id,
+            mechanic__user=user,
+        ).first()
+        if not service_request:
+            return Response(
+                {"message": messages.NO_OBJECT_FOUND},
+                status=status.HTTP_404_NOT_FOUND,
+            )
         serializer = MechanicServiceRequestSerializer(service_request)
         return Response(serializer.data, status=status.HTTP_200_OK)
 

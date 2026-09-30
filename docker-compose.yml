@@ -109,6 +109,9 @@ services:
   crapi-workshop:
     container_name: crapi-workshop
     image: crapi/crapi-workshop:${VERSION:-latest}
+    build:
+      context: ./crAPI/services/workshop
+      dockerfile: Dockerfile
     #ports:
     #  - "${LISTEN_IP:-127.0.0.1}:8000:8000"
     environment:

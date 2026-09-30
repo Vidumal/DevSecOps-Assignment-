@@ -386,11 +386,13 @@ class ApplyCouponView(APIView):
         with connection.cursor() as cursor:
             try:
                 cursor.execute(
-                    "SELECT coupon_code from applied_coupon WHERE user_id = "
-                    + str(user.id)
-                    + " AND coupon_code = '"
-                    + coupon_request_body["coupon_code"]
-                    + "'"
+                    """
+                    SELECT coupon_code
+                    FROM applied_coupon
+                    WHERE user_id = %s
+                    AND coupon_code = %s
+                    """,
+                    [user.id, coupon_request_body["coupon_code"]],
                 )
                 row = cursor.fetchall()
             except Exception as e:

@@ -16,6 +16,9 @@
 contains all the views related to Merchant
 """
 import logging
+import os
+from urllib.parse import urlsplit
+
 import requests
 from requests.exceptions import MissingSchema, InvalidURL
 from rest_framework import status
@@ -66,6 +69,54 @@ class ContactMechanicView(APIView):
             )
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+        supplied_mechanic_api = request_data.get("mechanic_api", "")
+        try:
+            parsed_mechanic_api = urlsplit(supplied_mechanic_api)
+            supplied_host = parsed_mechanic_api.hostname
+        except (TypeError, ValueError):
+            supplied_host = None
+            parsed_mechanic_api = None
+
+        expected_path = "/workshop/api/mechanic/receive_report"
+        if (
+            parsed_mechanic_api is None
+            or parsed_mechanic_api.scheme not in {"http", "https"}
+            or not supplied_host
+            or parsed_mechanic_api.username is not None
+            or parsed_mechanic_api.password is not None
+            or parsed_mechanic_api.path != expected_path
+            or parsed_mechanic_api.query
+            or parsed_mechanic_api.fragment
+        ):
+            log_error(
+                request.path,
+                request.data,
+                status.HTTP_400_BAD_REQUEST,
+                "Rejected unexpected mechanic API endpoint",
+            )
+            return Response(
+                {"message": "Invalid mechanic API endpoint."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        # Never connect to the host supplied by the client. Route only to this
+        # workshop service's fixed report receiver endpoint.
+        workshop_port = os.environ.get("SERVER_PORT", "8000")
+        if not workshop_port.isdecimal() or not 1 <= int(workshop_port) <= 65535:
+            return Response(
+                {"message": "Workshop service is misconfigured."},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+        request_url = (
+            f"http://127.0.0.1:{workshop_port}"
+            "/workshop/api/mechanic/receive_report"
+        )
+        mechanic_request_data = {
+            key: request_data[key]
+            for key in ("mechanic_code", "problem_details", "vin")
+            if key in request_data
+        }
+
         repeat_request_if_failed = request_data.get("repeat_request_if_failed", False)
         number_of_repeats = request_data.get("number_of_repeats", 1)
         if repeat_request_if_failed and number_of_repeats < 1:
@@ -81,14 +132,13 @@ class ContactMechanicView(APIView):
 
         repeat_count = 0
         while True:
-            request_url = request_data["mechanic_api"]
             logger.info(f"Repeat count: {repeat_count}, mechanic_api: {request_url}")
             try:
                 mechanic_response = requests.get(
                     request_url,
-                    params=request_data,
-                    headers={"Authorization": request.META.get("HTTP_AUTHORIZATION")},
-                    verify=False,
+                    params=mechanic_request_data,
+                    timeout=(3, 10),
+                    allow_redirects=False,
                 )
                 if mechanic_response.status_code == status.HTTP_200_OK:
                     logger.info(f"Got a valid response at repeat count: {repeat_count}")
@@ -101,7 +151,7 @@ class ContactMechanicView(APIView):
             except (MissingSchema, InvalidURL) as e:
                 log_error(request.path, request.data, status.HTTP_400_BAD_REQUEST, e)
                 return Response({"message": str(e)}, status=status.HTTP_400_BAD_REQUEST)
-            except requests.exceptions.ConnectionError as e:
+            except requests.exceptions.RequestException as e:
                 if not repeat_request_if_failed:
                     return Response(
                         {"message": messages.COULD_NOT_CONNECT},
